@@ -7,26 +7,8 @@ import type {
 
 const TRIVIA_BASE_URL = "https://opentdb.com";
 
-function decodeHtmlEntities(text: string): string {
-  const entities: Record<string, string> = {
-    "&quot;": '"',
-    "&#039;": "'",
-    "&apos;": "'",
-    "&amp;": "&",
-    "&lt;": "<",
-    "&gt;": ">",
-    "&ndash;": "–",
-    "&mdash;": "—",
-    "&lsquo;": "'",
-    "&rsquo;": "'",
-    "&ldquo;": '"',
-    "&rdquo;": '"',
-    "&hellip;": "…",
-    "&eacute;": "é",
-    "&Eacute;": "É",
-  };
-
-  return text.replace(/&[^;]+;/g, (match) => entities[match] || match);
+function decodeText(text: string): string {
+  return decodeURIComponent(text);
 }
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -56,6 +38,7 @@ export async function fetchQuestions(
   const params = new URLSearchParams({
     amount: String(Math.min(Math.max(amount, 1), 50)),
     type: "multiple",
+    encode: "url3986",
   });
 
   if (categoryId !== undefined) {
@@ -81,17 +64,17 @@ export async function fetchQuestions(
   }
 
   return data.results.map((q) => {
-    const correctAnswer = decodeHtmlEntities(q.correct_answer);
+    const correctAnswer = decodeText(q.correct_answer);
     const allAnswers = shuffleArray([
       correctAnswer,
-      ...q.incorrect_answers.map(decodeHtmlEntities),
+      ...q.incorrect_answers.map(decodeText),
     ]);
 
     return {
-      question: decodeHtmlEntities(q.question),
+      question: decodeText(q.question),
       answers: allAnswers,
       correctIndex: allAnswers.indexOf(correctAnswer),
-      category: decodeHtmlEntities(q.category),
+      category: decodeText(q.category),
       difficulty: q.difficulty,
     };
   });

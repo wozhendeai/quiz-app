@@ -2,6 +2,7 @@
  * Singleton mongodb connector
  */
 import { MongoClient, type Db } from "mongodb";
+import { ensureIndexes } from "./collections.js";
 
 let client: MongoClient | null = null;
 let db: Db | null = null;
@@ -25,6 +26,8 @@ export async function connectDB(): Promise<Db> {
 
   db = client.db();
   console.log("Connected to MongoDB");
+
+  await ensureIndexes();
 
   return db;
 }
