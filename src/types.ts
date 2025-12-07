@@ -1,8 +1,34 @@
+import type { ObjectId } from "mongodb";
+
 // Trivia API types
 
 export interface Category {
   id: number;
   name: string;
+}
+
+// User & Auth types
+
+/** User stored in MongoDB */
+export interface User {
+  _id?: ObjectId;
+  username: string;
+  passwordHash: string;
+  createdAt: Date;
+}
+
+/** Safe user data to send to client (no password) */
+export interface SafeUser {
+  id: string;
+  username: string;
+}
+
+/** User profile with play history */
+export interface UserProfile {
+  user: SafeUser;
+  scores: Score[];
+  totalGames: number;
+  averagePercentage: number;
 }
 
 /** Raw question format from Open Trivia DB API */
@@ -53,6 +79,7 @@ export interface AnswerRecord {
 /** Quiz session stored in MongoDB */
 export interface QuizSession {
   _id: string;
+  userId: string;
   username: string;
   questions: StoredQuestion[];
   currentQuestionIndex: number;
@@ -67,6 +94,7 @@ export interface QuizSession {
 
 /** Permanent score record for leaderboard */
 export interface Score {
+  userId: string;
   username: string;
   score: number;
   totalQuestions: number;

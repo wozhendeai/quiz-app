@@ -7,16 +7,9 @@ import {
   getLeaderboard,
   SessionError,
 } from "../services/session.js";
+import { requireAuth } from "../middleware/auth.js";
+import { getUserById } from "../services/auth.js";
 import type { SubmitAnswerRequest } from "../types.js";
-
-function generateRandomUsername(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let suffix = "";
-  for (let i = 0; i < 4; i++) {
-    suffix += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return `Player_${suffix}`;
-}
 
 const router = Router();
 
@@ -33,22 +26,36 @@ router.get("/categories", async (_req, res) => {
 /**
  * Start a new quiz session
  * Questions are stored server-side; client receives questions WITHOUT correct answers
+ * Requires authentication
  */
-router.post("/start", async (req, res) => {
+router.post("/start", requireAuth, async (req, res) => {
   try {
+    const userId = req.session.userId!;
+    const user = await getUserById(userId);
+
+    if (!user) {
+      res.status(401).json({ error: "User not found" });
+      return;
+    }
+
     const amount = parseInt(req.body.amount as string) || 10;
     const categoryId = req.body.categoryId
       ? parseInt(req.body.categoryId as string)
       : undefined;
     const categoryName = req.body.categoryName as string | undefined;
-    const username = (req.body.username as string) || generateRandomUsername();
 
     if (amount < 1 || amount > 50) {
       res.status(400).json({ error: "Amount must be between 1 and 50" });
       return;
     }
 
-    const response = await createQuizSession(amount, username, categoryId, categoryName);
+    const response = await createQuizSession(
+      amount,
+      userId,
+      user.username,
+      categoryId,
+      categoryName
+    );
     res.json(response);
   } catch (error) {
     console.error("Failed to start quiz:", error);

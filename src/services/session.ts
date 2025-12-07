@@ -28,6 +28,7 @@ export class SessionError extends Error {
 
 export async function createQuizSession(
   amount: number,
+  userId: string,
   username: string,
   categoryId?: number,
   categoryName?: string
@@ -47,6 +48,7 @@ export async function createQuizSession(
 
   const session: QuizSession = {
     _id: sessionId,
+    userId,
     username,
     questions: storedQuestions,
     currentQuestionIndex: 0,
@@ -168,6 +170,7 @@ export async function submitAnswer(
     const percentage = Math.round((newScore / totalQuestions) * 100);
 
     await scoresCollection.insertOne({
+      userId: session.userId,
       username: session.username,
       score: newScore,
       totalQuestions,
