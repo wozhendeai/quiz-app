@@ -41,7 +41,7 @@ export interface TriviaQuestion {
   incorrect_answers: string[];
 }
 
-/** Formatted question for frontend consumption (deprecated - includes answer) */
+/** Formatted question from trivia API (includes correct answer for server-side use) */
 export interface FormattedQuestion {
   question: string;
   answers: string[];
