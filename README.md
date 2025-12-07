@@ -2,6 +2,10 @@
 
 A trivia quiz application built with Express.js, TypeScript, MongoDB, and vanilla JavaScript web components.
 
+## Live Demo
+
+[Quiz App](https://quiz-app-ue83.onrender.com/)
+
 ## Features
 
 ### Core Features
@@ -99,8 +103,3 @@ quiz-app/
 ## Author
 
 Solo project - Full Stack Development
-
-## Live Demo
-
-<!-- TODO -->
-[Quiz App]()
